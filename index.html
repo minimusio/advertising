@@ -3,19 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Random Quote</title>
+  <title>Minimus Community Edition - launch posts</title>
   <style>
     :root {
-      --bg: #0f1115;
-      --card: #171a21;
-      --fg: #e8eaed;
-      --muted: #9aa0aa;
-      --accent: #5b8cff;
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --fg: #161b26;
+      --muted: #6b7280;
+      --faint: #aab1bd;
+      --accent: #4684f3;
+      --accent-strong: #2f6ce0;
+      --border: #e6eaf1;
+      --ok: #16a34a;
+      --radius: 16px;
     }
     * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
       margin: 0;
-      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -23,80 +28,281 @@
       background: var(--bg);
       color: var(--fg);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
     .card {
       width: 100%;
-      max-width: 640px;
+      max-width: 660px;
       background: var(--card);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 2.5rem 2rem;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: 0 1px 2px rgba(22, 27, 38, 0.04), 0 12px 32px rgba(22, 27, 38, 0.08);
     }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+    }
+    .eyebrow b { color: var(--fg); }
+    .counter {
+      font-variant-numeric: tabular-nums;
+      font-size: 0.82rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .post { transition: opacity 0.18s ease; }
     blockquote {
       margin: 0;
-      font-size: 1.6rem;
-      line-height: 1.4;
+      font-size: 1.3rem;
+      line-height: 1.5;
       font-weight: 500;
+      letter-spacing: -0.005em;
+      white-space: pre-wrap;
     }
-    .author {
+    .link {
+      display: inline-block;
+      margin-top: 1rem;
+      color: var(--accent);
+      font-weight: 500;
+      text-decoration: none;
+      word-break: break-word;
+    }
+    .link:hover { color: var(--accent-strong); text-decoration: underline; }
+    .angle {
       margin-top: 1.25rem;
-      color: var(--muted);
-      font-size: 1rem;
+      color: var(--faint);
+      font-size: 0.82rem;
     }
-    .author::before { content: "\2014 "; }
-    button {
-      margin-top: 2rem;
-      padding: 0.7rem 1.3rem;
-      font-size: 1rem;
-      color: #fff;
-      background: var(--accent);
+    .dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.1rem;
+      margin: 1.5rem 0 1rem;
+      margin-left: -6px;
+    }
+    /* 24px touch target around a 9px visual dot, for comfortable tapping on phones. */
+    .dot {
+      width: 24px;
+      height: 24px;
+      padding: 0;
       border: none;
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+    }
+    .dot::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #d4dae4;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .dot:hover::before { background: var(--faint); }
+    .dot[aria-current="true"]::before { background: var(--accent); transform: scale(1.3); }
+    .actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    button.btn {
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 0.62rem 1.1rem;
       border-radius: 10px;
       cursor: pointer;
-      transition: filter 0.15s ease;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--fg);
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     }
-    button:hover { filter: brightness(1.1); }
-    button:active { filter: brightness(0.95); }
+    button.btn:hover { background: #f1f4f9; }
+    .copy {
+      margin-left: auto;
+      color: #fff;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .copy:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
+    .copy.copied { background: var(--ok); border-color: var(--ok); }
+    .hint {
+      margin-top: 1.25rem;
+      font-size: 0.76rem;
+      color: var(--faint);
+    }
+    kbd {
+      font: inherit;
+      font-size: 0.72rem;
+      padding: 0.05rem 0.35rem;
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      background: #fafbfd;
+    }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+    @media (max-width: 480px) {
+      body { padding: 0.75rem; }
+      .card { padding: 1.4rem; }
+      blockquote { font-size: 1.15rem; }
+      .actions { gap: 0.5rem; }
+      .prev, .next { flex: 1; }
+      .copy { flex: 1 0 100%; margin-left: 0; }
+    }
   </style>
 </head>
 <body>
   <main class="card">
-    <blockquote id="quote"></blockquote>
-    <div class="author" id="author"></div>
-    <button id="next" type="button">New quote</button>
+    <header>
+      <span class="eyebrow"><b>Minimus Community Edition</b> · launch posts</span>
+      <span class="counter" id="counter" aria-hidden="true"></span>
+    </header>
+
+    <div class="post" id="post" aria-live="polite">
+      <blockquote id="quote"></blockquote>
+      <a class="link" id="link" target="_blank" rel="noopener"></a>
+      <div class="angle" id="angle"></div>
+    </div>
+
+    <div class="dots" id="dots" role="tablist" aria-label="Choose a post"></div>
+
+    <div class="actions">
+      <button class="btn prev" id="prev" type="button" aria-label="Previous post">← Prev</button>
+      <button class="btn next" id="next" type="button" aria-label="Next post">Next →</button>
+      <button class="btn copy" id="copy" type="button">Copy post</button>
+    </div>
+
+    <p class="hint"><kbd>←</kbd> <kbd>→</kbd> to browse · <kbd>C</kbd> to copy</p>
   </main>
 
   <script>
-    const quotes = [
-      { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-      { text: "Simplicity is the soul of efficiency.", author: "Austin Freeman" },
-      { text: "First, solve the problem. Then, write the code.", author: "John Johnson" },
-      { text: "Programs must be written for people to read, and only incidentally for machines to execute.", author: "Harold Abelson" },
-      { text: "The best way to predict the future is to invent it.", author: "Alan Kay" },
-      { text: "Premature optimization is the root of all evil.", author: "Donald Knuth" },
-      { text: "Talk is cheap. Show me the code.", author: "Linus Torvalds" },
-      { text: "Make it work, make it right, make it fast.", author: "Kent Beck" },
-      { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
-      { text: "Stay hungry, stay foolish.", author: "Whole Earth Catalog" }
-    ];
+    (function () {
+      "use strict";
 
-    const quoteEl = document.getElementById("quote");
-    const authorEl = document.getElementById("author");
-    let last = -1;
+      const LINK = "https://images.minimus.io/";
+      const POSTS = [
+        { angle: "The big news angle", text: "Minimus Community Edition is live. Hundreds of near-zero CVE container images, continuously built from source - free. No trial. No auth wall. No signup. Just secure images, ready to use. 🚀" },
+        { angle: "Developer-first angle", text: "No budget approval. No enterprise contract. No waiting. Developers can now access hardened, minimal container images - FIPS, CIS, NIST, STIG compliant - for free, right now. That's the Minimus Community Edition." },
+        { angle: "The \"what's included\" post", text: "We just made the world's largest selection of near-zero CVE container images free to use. Major + minor versions. Full SBOM. Vulnerability visibility. FIPS/CIS/NIST/STIG compliance. All of it. No strings attached." },
+        { angle: "The belief statement", text: "Secure container images should be easy to access, adopt, and evaluate. Today, we made that real. Minimus Community Edition - free, open, no signup required." },
+        { angle: "The problem/solution", text: "Evaluating whether a more secure image foundation is worth it shouldn't require a sales call. Now it doesn't. Minimus Community Edition is live - try it yourself." },
+        { angle: "The short punchy one", text: "Near-zero CVE. Built from source. Compliant. Free. No trial. No auth wall. No signup. Minimus Community Edition is here." },
+        { angle: "The \"see for yourself\" angle", text: "Curious what your vulnerability counts, image sizes, or maintenance burden would look like on a different foundation? Now you can find out - no contract needed. Minimus Community Edition is live today." },
+        { angle: "The security-meets-simplicity angle", text: "Security and simplicity shouldn't be a tradeoff. Minimus Community Edition gives developers access to hardened, compliant container images for free - so secure infrastructure is the default, not the exception." },
+        { angle: "The PLG milestone angle", text: "Big day for us. We're going product-led with Minimus Community Edition - making our full image gallery free and accessible to every developer, no friction. This is how we believe security should work." },
+        { angle: "The team pride angle", text: "Proud of what we shipped today. Minimus Community Edition brings near-zero CVE, continuously updated, compliance-ready container images to anyone - free, no signup. Our team has been building toward this. Go try it." }
+      ];
 
-    function show() {
-      let i = Math.floor(Math.random() * quotes.length);
-      if (quotes.length > 1) {
-        while (i === last) i = Math.floor(Math.random() * quotes.length);
+      const els = {
+        post: document.getElementById("post"),
+        quote: document.getElementById("quote"),
+        link: document.getElementById("link"),
+        angle: document.getElementById("angle"),
+        counter: document.getElementById("counter"),
+        dots: document.getElementById("dots"),
+        prev: document.getElementById("prev"),
+        next: document.getElementById("next"),
+        copy: document.getElementById("copy")
+      };
+
+      let index = 0;
+      let copyResetTimer = null;
+
+      // Text placed on the clipboard: the post plus the link, never the angle label.
+      function clipboardText(i) {
+        return POSTS[i].text + "\n\n" + LINK;
       }
-      last = i;
-      quoteEl.textContent = quotes[i].text;
-      authorEl.textContent = quotes[i].author;
-    }
 
-    document.getElementById("next").addEventListener("click", show);
-    show();
+      function buildDots() {
+        POSTS.forEach(function (_, i) {
+          const dot = document.createElement("button");
+          dot.className = "dot";
+          dot.type = "button";
+          dot.setAttribute("role", "tab");
+          dot.setAttribute("aria-label", "Post " + (i + 1));
+          dot.addEventListener("click", function () { go(i); });
+          els.dots.appendChild(dot);
+        });
+      }
+
+      function render() {
+        const post = POSTS[index];
+        els.quote.textContent = post.text;
+        els.link.textContent = LINK;
+        els.link.href = LINK;
+        els.angle.textContent = "#" + (index + 1) + " · " + post.angle;
+        els.counter.textContent = (index + 1) + " / " + POSTS.length;
+
+        const dots = els.dots.children;
+        for (let i = 0; i < dots.length; i++) {
+          dots[i].setAttribute("aria-current", i === index ? "true" : "false");
+        }
+
+        resetCopyButton();
+      }
+
+      function go(i) {
+        index = (i + POSTS.length) % POSTS.length;
+        render();
+      }
+
+      function resetCopyButton() {
+        if (copyResetTimer) { clearTimeout(copyResetTimer); copyResetTimer = null; }
+        els.copy.textContent = "Copy post";
+        els.copy.classList.remove("copied");
+      }
+
+      async function copy() {
+        const text = clipboardText(index);
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (err) {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "absolute";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        els.copy.textContent = "Copied ✓";
+        els.copy.classList.add("copied");
+        copyResetTimer = setTimeout(resetCopyButton, 1800);
+      }
+
+      els.prev.addEventListener("click", function () { go(index - 1); });
+      els.next.addEventListener("click", function () { go(index + 1); });
+      els.copy.addEventListener("click", copy);
+
+      document.addEventListener("keydown", function (e) {
+        if (e.target.closest && e.target.closest("button")) return;
+        if (e.key === "ArrowLeft") { go(index - 1); }
+        else if (e.key === "ArrowRight") { go(index + 1); }
+        else if (e.key === "c" || e.key === "C") { copy(); }
+      });
+
+      buildDots();
+      render();
+    })();
   </script>
 </body>
 </html>
